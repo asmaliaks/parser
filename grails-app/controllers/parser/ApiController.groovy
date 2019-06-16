@@ -1,10 +1,7 @@
 package parser
 
-
 import grails.rest.RestfulController
 import org.springframework.web.multipart.MultipartFile
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 class ApiController extends RestfulController {
     static responseFormats = ['json', 'xml']
@@ -17,23 +14,15 @@ class ApiController extends RestfulController {
         File newFile = new File(file.part.location.path+'/file.csv')
         newFile.text = ""
         file.transferTo(newFile)
-        String command = ""
         BigInteger line_no = 1
-        Integer counter = 1
-        Integer counterInserted = 1
+        File csvFile = new File(newFile.absolutePath.replace(newFile.name, 'fileCsv.csv'))
+        csvFile.text = ""
         String line
+        Integer counter = 0
+        String append = ""
         newFile.withReader { reader ->
             while ((line = reader.readLine())!=null) {
-                if(counter == 1) {
-                    command = "mysql -h localhost -u root -p5233 -e \"use parser; INSERT INTO municipality_transactions " +
-                            "(company_id, " +
-                            "year," +
-                            " month, voucher_no, line_no, " +
-                            "invoice_no, " +
-                            "invoice_date, due_date, posting_date, rekontro_no, company_name, org_no, net_amount, vat, " +
-                            "gross_amount, vat_code, receiver, poster, authoriser, assigner, type, responsible, service, object, " +
-                            "project, text, version) VALUES "
-                }
+
                 List<String> item = line.split(";")
                 String voucher_no = item[0] ?: "1"
                 String invoice_no = item[3] ?: "1"
@@ -59,37 +48,24 @@ class ApiController extends RestfulController {
                 String object = item[22] ?: "1"
                 String project = item[23] ?: "1"
                 String text = item[28] ?: "1"
-                if(line_no > 1){
-                    command += ","
+                append += "${line_no},1,${vat_code},${rekonto_no},${object},${receiver},${responsible},1," +
+                        "${month},2018-01-03 00:00:00,${net_amount},${poster},${authoriser},${text},${org_no},${service}," +
+                        "${gross_amount}," +
+                        "${company_name},${line_no},${type},2018-01-03 00:00:00,${invoice_no},${year},${project},${voucher_no},${assigner}," +
+                        "2018-01-03 00:00:00,${vat}\n"
+                if(counter == 500){
+                    csvFile.append(append)
+                    counter = 0
+                    append = ""
                 }
-
-                command += "(1, ${year}, ${month}, \'${voucher_no}\', \'${line_no}\', \'${invoice_no}\'," +
-//                    "\'${invoice_date.getYear()}-${invoice_date.getMonth()}-${invoice_date.getDay()}\'," +
-//                    "\'${due_date.getYear()}-${due_date.getMonth()}-${due_date.getDay()}\', " +
-//                    "\'${posting_date.getYear()}-${posting_date.getMonth()}-${posting_date.getDay()}\', " +
-                "\'2018-01-03\', \'2018-01-03\',\'2018-01-03\'," +
-                "\'${rekonto_no}\', " +
-                "\'${company_name}\',\'${org_no}\', ${net_amount}, " +
-                "${vat}," +
-                "${gross_amount}, \'${vat_code}\', \'${receiver}\', \'${poster}\', \'${authoriser}\', " +
-                "\'${assigner}\'," +
-                "\'${type}\', " +
-                "\'${responsible}\', \'${service}\', \'${object}\', \'${project}\', \'${text}\',1)"
                 line_no++
                 counter++
-                if(counter == 10){
-                    counter = 1
-                    println "command: ${command}"
-                    def process = ['bash', '-c', command + "\""].execute()
-                    process.waitFor()
-                    command = ""
-                    counterInserted++
-                    println "inserted ${counterInserted}"
-                }
             }
+            csvFile.append(append)
+            String command = "mysql -u root -p5233 -e \"use parser; LOAD DATA LOCAL INFILE '${csvFile.absolutePath}' INTO TABLE " +
+                    "municipality_transactions FIELDS TERMINATED BY ','"
             def process = ['bash', '-c', command + "\""].execute()
             process.waitFor()
-            println "lastpeace inserted"
         }
         respond([200])
     }
