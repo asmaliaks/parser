@@ -1,6 +1,7 @@
 package parser
 
 import grails.rest.RestfulController
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.web.multipart.MultipartFile
 
 class ApiController extends RestfulController {
@@ -20,15 +21,16 @@ class ApiController extends RestfulController {
         String line
         Integer counter = 0
         String append = ""
+        Writer writer = new FileWriter(csvFile, true)
         newFile.withReader { reader ->
             while ((line = reader.readLine())!=null) {
 
                 List<String> item = line.split(";")
                 String voucher_no = item[0] ?: "1"
                 String invoice_no = item[3] ?: "1"
-                Date invoice_date = Date.parse("yyyyMMdd", item[4])
-                Date due_date = Date.parse("yyyyMMdd", item[5])
-                Date posting_date = Date.parse("yyyyMMdd", item[6])
+//                Date invoice_date = Date.parse("yyyyMMdd", item[4])
+//                Date due_date = Date.parse("yyyyMMdd", item[5])
+//                Date posting_date = Date.parse("yyyyMMdd", item[6])
                 Integer year  = item[7].substring(0, 4) as Integer
                 Integer month = item[7].substring(4) as Integer
                 String rekonto_no = item[8] ?: "1"
@@ -54,14 +56,19 @@ class ApiController extends RestfulController {
                         "${company_name},${line_no},${type},2018-01-03 00:00:00,${invoice_no},${year},${project},${voucher_no},${assigner}," +
                         "2018-01-03 00:00:00,${vat}\n"
                 if(counter == 500){
-                    csvFile.append(append)
+
+
+                    InvokerHelper.write(writer, append)
+                    writer.flush()
                     counter = 0
                     append = ""
                 }
                 line_no++
                 counter++
             }
-            csvFile.append(append)
+            InvokerHelper.write(writer, append)
+            writer.flush()
+            writer.close();
             String command = "mysql -u root -p5233 -e \"use parser; LOAD DATA LOCAL INFILE '${csvFile.absolutePath}' INTO TABLE " +
                     "municipality_transactions FIELDS TERMINATED BY ','"
             def process = ['bash', '-c', command + "\""].execute()
