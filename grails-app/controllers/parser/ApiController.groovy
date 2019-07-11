@@ -1,74 +1,95 @@
 package parser
 
+import grails.core.GrailsApplication
 import grails.rest.RestfulController
-import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.web.multipart.MultipartFile
 
 class ApiController extends RestfulController {
     static responseFormats = ['json', 'xml']
+    GrailsApplication grailsApplication
     ApiController() {
         super(Transaction)
     }
 
     def save(){
+        String sequrityToken = grailsApplication.config.getProperty("sequrity.token")
+        if(request.getHeader("Authorization") != sequrityToken){
+            log.debug "Authorization failed token:${sequrityToken}"
+            response.status = 403
+            respond(["Forbidden"])
+            return
+        }
         log.debug("START")
         MultipartFile file = request.getFile('file')
         InputStream inputStream = file.getInputStream()
         File newFile = new File(file.part.location.path+'/file.csv')
         newFile.text = ""
-        String append = ""
-        Writer writer = new FileWriter(newFile, true)
         log.debug("START READING")
-        BigInteger line_no = 1
-        Integer counter = 0
+        BigInteger lineNumber = 1
+
+        log.debug "Start reading file"
+        FileWriter fileWriter = new FileWriter(newFile.absolutePath, true)
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)
+        PrintWriter out = new PrintWriter(bufferedWriter)
+
+        log.debug "Start reading input"
         inputStream.eachLine { String line ->
-            List<String> item = line.split(";")
-            String voucher_no = item[0] ?: "1"
-            String invoice_no = item[3] ?: "1"
-//                Date invoice_date = Date.parse("yyyyMMdd", item[4])
-//                Date due_date = Date.parse("yyyyMMdd", item[5])
-//                Date posting_date = Date.parse("yyyyMMdd", item[6])
-            Integer year  = item[7].substring(0, 4) as Integer
-            Integer month = item[7].substring(4) as Integer
-            String rekonto_no = item[8] ?: "1"
-            String company_name = item[9] ?: "1"
-            String org_no = item[10] ?: "1"
-            BigDecimal net_amount = 10.00
-            BigDecimal vat =  10.00
-            BigDecimal gross_amount = 10.00
-            String vat_code = item[14] ?: "1"
-            String receiver = item[15] ?: "1"
-            String poster = item[16] ?: "1"
-            String authoriser = item[17] ?: "1"
-            String assigner = item[18] ?: "1"
-            String type = item[19] ?: "1"
-            String responsible = item[20] ?: "1"
-            String service = item[21] ?: "1"
-            String object = item[22] ?: "1"
-            String project = item[23] ?: "1"
-            String text = item[28] ?: "1"
-            append += "${line_no},1,${vat_code},${rekonto_no},${object},${receiver},${responsible},1," +
-                    "${month},2018-01-03 00:00:00,${net_amount},${poster},${authoriser},${text},${org_no},${service}," +
-                    "${gross_amount}," +
-                    "${company_name},${line_no},${type},2018-01-03 00:00:00,${invoice_no},${year},${project},${voucher_no},${assigner}," +
-                    "2018-01-03 00:00:00,${vat}\n"
-            if(counter == 100){
-                InvokerHelper.write(writer, append)
-                writer.flush()
-                counter = 0
-                append = ""
+            out.print(convertLinIntoItemCommand(line, lineNumber))
+            if(lineNumber % 1000 == 0){
+                log.debug "Start reading line:${lineNumber}"
             }
-            line_no++
-            counter++
+            lineNumber++
         }
-        InvokerHelper.write(writer, append)
-        writer.flush()
-        writer.close()
-        String command = "mysql -u root -p5233 -e \"use parser; LOAD DATA LOCAL INFILE '${newFile.absolutePath}' INTO TABLE " +
+        log.debug "Finish reading input"
+
+        log.debug "Start writing file"
+
+        out.close()
+        log.debug "Finish writing file"
+        String dbUsername = grailsApplication.config.getProperty('dataSource.username')
+        String dbPass = grailsApplication.config.getProperty('dataSource.password')
+        String command = "mysql -u ${dbUsername} -p${dbPass} -e \"use parser; LOAD DATA LOCAL INFILE '${newFile.absolutePath}' INTO " +
+                "TABLE " +
                 "municipality_transactions FIELDS TERMINATED BY ','"
         def process = ['bash', '-c', command + "\""].execute()
         process.waitFor()
         log.debug("FINISH READING")
-        respond([200])
+        response.status = 200
+        respond(["done"])
+    }
+
+    static String convertLinIntoItemCommand(final String line, final BigInteger lineNumber){
+        List<String> item = line.split(";")
+        String voucher_no = item[0] ?: ""
+        String invoice_no = item[3] ?: ""
+        String invoice_date = Date.parse("yyyyMMdd", item[4]).toTimestamp()
+        String due_date = Date.parse("yyyyMMdd", item[5]).toTimestamp()
+        String posting_date = Date.parse("yyyyMMdd", item[6]).toTimestamp()
+        Integer year  = item[7].substring(0, 4) as Integer
+        Integer month = item[7].substring(4) as Integer
+        String rekonto_no = item[8] ?: ""
+        String company_name = item[9] ?: ""
+        String org_no = item[10] ?: ""
+        BigDecimal net_amount = item[11] as Integer
+        BigDecimal vat =  item[12] as Integer
+        BigDecimal gross_amount = item[13] as Integer
+        String vat_code = item[14] ?: ""
+        String receiver = item[15] ?: ""
+        String poster = item[16] ?: ""
+        String authoriser = item[17] ?: ""
+        String assigner = item[18] ?: ""
+        String type = item[19] ?: ""
+        String responsible = item[20] ?: ""
+        String service = item[21] ?: ""
+        String object = item[22] ?: ""
+        String project = item[23] ?: ""
+        String text = item[28] ?: ""
+
+        return "${lineNumber},1,${vat_code},${rekonto_no},${object},${receiver},${responsible},1," +
+                "${month},${invoice_date},${net_amount},${poster},${authoriser},${text},${org_no},${service}," +
+                "${gross_amount}," +
+                "${company_name},${lineNumber},${type},${due_date},${invoice_no},${year},${project}," +
+                "${voucher_no},${assigner}," +
+                "${posting_date},${vat}\n"
     }
 }

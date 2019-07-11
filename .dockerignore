@@ -1,0 +1,7 @@
+#docker ignore files
+.git
+.gradle
+.idea
+.settings
+build
+
