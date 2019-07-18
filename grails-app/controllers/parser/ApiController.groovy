@@ -22,7 +22,7 @@ class ApiController extends RestfulController {
         log.debug("START")
         MultipartFile file = request.getFile('file')
         InputStream inputStream = file.getInputStream()
-        File newFile = new File(file.part.location.path+'/file.csv')
+        File newFile = new File('file.csv')
         newFile.text = ""
         log.debug("START READING")
         BigInteger lineNumber = 1
@@ -48,6 +48,7 @@ class ApiController extends RestfulController {
         log.debug "Finish writing file"
         String dbUsername = grailsApplication.config.getProperty('dataSource.username')
         String dbPass = grailsApplication.config.getProperty('dataSource.password')
+        log.debug("data from file: ${newFile.absolutePath}")
         String command = "mysql -u ${dbUsername} -p${dbPass} -e \"use parser; LOAD DATA LOCAL INFILE '${newFile.absolutePath}' INTO " +
                 "TABLE " +
                 "municipality_transactions FIELDS TERMINATED BY ','"

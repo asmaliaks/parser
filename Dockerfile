@@ -1,25 +1,38 @@
-####################################
-## docker instruction for console
-####################################
 
-#step 1
-# add mysql server docker image
-#sudo docker run --name parser-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=5233 -d mysql:5.7.26
+#----------------------------------------------------------------------------------
 
-#1.1 get container IP and put into config
-# docker inspect parser-mysql // and find ip address in the input
-
-#step 2
-#build docker image with command
+# step 1 create docker image
 # sudo docker build -t parser .
 
-#step 3
-#run docker image with command
-# sudo docker run -p 80:8080 parser
+# step 2 run docker image with port 80 for http and 3306 for connection  with mysql client
+# sudo docker run -p 80:8080 -p 3306:3306 -ti parser
+
+#----------------------------------------------------------------------------------
 
 
-#Initial container OpenJDK 8
-FROM openjdk:8
+
+FROM mysql:5.7.26
+
+
+# set database name and root user password
+ENV MYSQL_HOST localhost
+ENV MYSQL_ROOT_PASSWORD 5233
+ENV MYSQL_DATABASE parser
+
+ENV GOSU_VERSION 1.7
+
+# install Java
+RUN echo 'Install JAVA' && \   
+    mkdir -p /usr/share/man/man1 && \
+    apt-get update -y && \
+    apt-get install default-jdk -y
+
+# test java 
+RUN java -version
+
+# install some tools which allows to install grails and help work inside container 
+RUN echo 'Install missing tools' && \
+    apt-get install wget unzip net-tools nano mc -y
 
 # describe versions
 ENV GRAILS_VERSION=3.3.10
@@ -42,18 +55,24 @@ RUN set -o errexit -o nounset \
     && echo "Testing Grails installation" \
     && grails --version
 
-
-#Copy files
+#Copy application files
 WORKDIR /app
 COPY . /app
 
-RUN gradle clean
+# compile application
 RUN grails clean
 RUN grails compile
 
+# start mysql service wne run container
+COPY start_mysql.sh /app/start_mysql.sh
+RUN chmod 777 /app/start_mysql.sh
+RUN ln -s /app/start_mysql.sh /entrypoint_mysql.sh # backwards compat
+
 #Open port
-EXPOSE 8080
+EXPOSE 8080 3306 33060
+
+#Execute script when run container
+ENTRYPOINT ["/app/start_mysql.sh"]
 
 #Run command for docker image
-CMD ["grails","run-app"]
-
+CMD ["/bin/bash","run"]
