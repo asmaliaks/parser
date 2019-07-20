@@ -4,13 +4,18 @@ buildscript {
         maven { url "https://repo.grails.org/grails/core" }
     }
     dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
         classpath "org.grails.plugins:views-gradle:1.2.9"
     }
 }
 
-version "0.2"
+plugins {
+    id "fi.evident.beanstalk" version "0.2.0"
+}
+
+version "0.1-SNAPSHOT"
 group "parser"
 
 apply plugin:"eclipse"
@@ -18,6 +23,7 @@ apply plugin:"idea"
 apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.plugins.views-json"
+apply plugin:"com.github.johnrengelman.shadow"
 
 repositories {
     mavenLocal()
@@ -60,7 +66,27 @@ dependencies {
     testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:2.47.1"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
+
+    compile 'fi.evident.beanstalk:fi.evident.beanstalk.gradle.plugin:0.2.0'
 }
+
+
+
+beanstalk {
+    //profile = 'my-profile' // Only required if using .aws/credentials
+    s3Endpoint = "s3-us-east-2.amazonaws.com"
+    beanstalkEndpoint = "elasticbeanstalk.us-east-2.amazonaws.com"
+
+
+    deployments {
+        production {
+            file = tasks.war
+            application = 'parser'
+            environment = 'parser-prod'
+        }
+    }
+}
+
 
 bootRun {
     jvmArgs('-Dspring.output.ansi.enabled=always')
