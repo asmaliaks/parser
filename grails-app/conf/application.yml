@@ -78,10 +78,16 @@ environments:
         useSSL: false
         dataSource:
             driverClassName: com.mysql.cj.jdbc.Driver
+            dbHostName: ${MYSQL_HOST}
             dbCreate: update
-            url: jdbc:mysql://127.0.0.1:3306/parser
-            username: root
-            password: 5233
+            url: jdbc:mysql://${MYSQL_HOST}/parser
+            username: ${DB_USERNAME}
+            password: ${DB_PASS}
+#            dbHostName: localhost
+#            dbCreate: update
+#            url: jdbc:mysql://localhost/parser
+#            username: root
+#            password: 5233
             dialect: org.hibernate.dialect.MySQL5Dialect
     test:
         dataSource:

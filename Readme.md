@@ -3,8 +3,137 @@ The microservice's purpose is to parse data from ccv files which have specific s
 ## Minimum system requirements
 Application needs two docker containers which use 1238 mb of disk space
 so it needs about 6-8 of disk space for correct work and at least 8 GB of RAM
+## HOW to run for AWS Ec2 Beanstalk 
 
-## How to run
+1.If there is a wish to create .war file by own hands (CAN BE SKIPPED. if you want to skip this then go to the 2-nd 
+step)
+- Install jdk 8 
+
+for CentOS:
+####### Remove java 7 if existed
+> sudo yum remove -y java
+
+####### Install basic packages
+> sudo yum install -y git
+
+####### Download and install java 8
+> wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; 
+oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz"
+tar -xzvf jdk-8u131-linux-x64.tar.gz
+rm -rf jdk-8u131-linux-x64.tar.gz
+
+####### Configure JAVA_HOME
+>sudo vim ~/.bashrc
+
+add following strings
+>alias cls='clear'
+>export JAVA_HOME=~/jdk1.8.0_131
+>export JRE_HOME=~/jdk1.8.0_131/jre
+>export PATH=$PATH:~/jdk1.8.0_131/bin:/~/jdk1.8.0_131/jre/bin
+
+then run these 
+
+>source ~/.bashrc 
+
+>java -version
+
+if you see smth like this that means you did great
+>openjdk version "1.8.0_212"
+ OpenJDK Runtime Environment (build 1.8.0_212-8u212-b03-0ubuntu1.16.04.1-b03)
+ OpenJDK 64-Bit Server VM (build 25.212-b03, mixed mode)
+
+If it needs to be installed on Ubuntu it can be easily googled. commands can be different from one to another version
+ of Ubuntu
+  
+  - SDKMAN installation for CentOS
+  > yum install which
+  
+  > yum install unzip
+  
+  > yum install zip
+  
+  > cd /opt/
+  
+  > curl -s "https://get.sdkman.io" | bash
+  
+  > source "$HOME/.sdkman/bin/sdkman-init.sh"
+  
+  > sdk version
+  
+  (if sdk version is seen that means everything is OK)
+  
+  for Ubuntu:
+  > curl -s https://get.sdkman.io | bash
+  
+  > source "$HOME/.sdkman/bin/sdkman-init.sh"
+  
+  - Grails installation
+  > sdk install grails 3.2.11
+  
+  > sdk use grails 3.2.11
+  
+  > grails -version
+  
+  If you see following, that means it went good:
+  >| Grails Version: 3.3.10
+  
+  >| JVM Version: 1.8.0_212
+  
+  - Mysql installation
+  
+  version of mysql has to be installed not higher than 5.7.26 (can be freely googled, command can be differet from 
+  version to version of OS).  
+  Database 'parser' needs to be created after msyql installation
+  
+  - Cloning project from git repository
+  > git clone git@github.com:asmaliaks/parser.git
+  
+  Then find confg file and set DB credentials:
+  
+  > parser/grails-app/conf/application.yml
+  
+  and changes `username` (`environments.development.dataSource.username`) and `password` (`environments.development
+  .dataSource.password`).
+  - Generating .war file
+  Being in the root folder of the app run command: 
+  > grails war
+  
+  Now we have .war file which located in `build/libs` and has .war extension
+  
+  If previous things were done well 
+  
+  2.Creating Beanstalk environment specially for grails in aws console :
+- http://joxi.ru/V2VpKKVidDn6Qr
+
+- http://joxi.ru/xAeE00aSRqyQNA
+
+- http://joxi.ru/brRj66bH7EbKJr or http://joxi.ru/nAyQ88jSgen7QA and select "Create environment"
+
+- http://joxi.ru/Dr81EELio5bwpm
+
+- http://joxi.ru/KAxX99EtZjoyjA
+
+- http://joxi.ru/12M4jj0HlQJZPm
+
+    Click "Create environment" when uploading complete
+    
+- http://joxi.ru/L21lbbYTRxQGgm (wait a few minutes)
+
+- http://joxi.ru/BA0OvvDTMXQl92  it meаns OK
+
+- http://joxi.ru/J2byllLh0WDRGm
+
+- http://joxi.ru/xAeE00aSRqOn7A
+endpoint for database RDS with opened 3360 port
+http://joxi.ru/V2VpKKVidDQbRr
+and add DB_USERNAME and DB_PASS
+  
+
+
+
+
+
+## How to run (ONLY FOR DOCKER)
 
 1.build docker container using following command
 

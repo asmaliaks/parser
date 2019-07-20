@@ -48,8 +48,10 @@ class ApiController extends RestfulController {
         log.debug "Finish writing file"
         String dbUsername = grailsApplication.config.getProperty('dataSource.username')
         String dbPass = grailsApplication.config.getProperty('dataSource.password')
+        String dbHostName = grailsApplication.config.getProperty('dataSource.dbHostName')
         log.debug("data from file: ${newFile.absolutePath}")
-        String command = "mysql -u ${dbUsername} -p${dbPass} -e \"use parser; LOAD DATA LOCAL INFILE '${newFile.absolutePath}' INTO " +
+        String command = "mysql -u ${dbUsername} -p${dbPass} -h${dbHostName}" +
+                "-e \"use parser; LOAD DATA LOCAL INFILE '${newFile.absolutePath}' INTO " +
                 "TABLE " +
                 "municipality_transactions FIELDS TERMINATED BY ','"
         def process = ['bash', '-c', command + "\""].execute()
