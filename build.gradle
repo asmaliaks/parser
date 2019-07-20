@@ -70,18 +70,7 @@ dependencies {
     compile 'fi.evident.beanstalk:fi.evident.beanstalk.gradle.plugin:0.2.0'
 }
 
-shadowJar {
-    mergeServiceFiles()
-}
 
-shadowJar {
-    archiveName = 'application.jar'
-}
-
-task beanstalkArchive(type: Zip, dependsOn: jar) {
-    from 'src/main/eb'
-    from tasks.shadowJar
-}
 
 beanstalk {
     //profile = 'my-profile' // Only required if using .aws/credentials
@@ -91,7 +80,7 @@ beanstalk {
 
     deployments {
         production {
-            file = tasks.beanstalkArchive
+            file = tasks.war
             application = 'parser'
             environment = 'Parser-env'
         }
