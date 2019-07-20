@@ -6,51 +6,16 @@ so it needs about 6-8 of disk space for correct work and at least 8 GB of RAM
 
 ## How to run
 
-1.create mysql container using following command
+1.build docker container using following command
 
->```sudo docker run --name parser-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=db_pass -d mysql:5.7.26```
+> ```sudo docker build -t parser .```
  
- where `db_pass` is your database password and `parser-mysql` is the container's name both can be random
+ 2.Once the container has been created it needs to be started
  
- 2.Once the container has been created database needs to be created
- - enter into container
- 
-> `docker exec -it parser-mysql /bin/bash`
+> `sudo docker run -p 80:8080 -p 3306:3306 -ti parser`
 
-> `mysql -u root -pdb_pass`
- 
- - where `db_pass` is the database's password
- 
- > `create schema parser;`
- 
- > `exit;`
- 
- where `parser` is the database 
- 
- 3.Then IP address of `parser-mysql` must be found
- > `docker inspect parser-mysql`
- 
- There will be `IPAddress` parameter in the input
- 
- Copy the IP address and paste it into file located `grails-app/conf/application.yml`
- as parameter of `environments.development.dataSource.url`
- 
- it should look like this `jdbc:mysql://your_IP_address/parser`
- 
- where `your_IP_addres` is the IP address and `parser` is a name of the database
- 
- 4.Then go to the project's root folder
- > `cd /some/folder/parser
- 
- - then build image with application using following command
- > `sudo docker build -t parser .` (don't miss the dot)
- 
- - and wait until execution goes through all steps and last string be displayed
- 
- >   ```Successfully tagged parser:latest```
- 
- 5.If everything is successful let's run the container where application works in
- > `sudo docker run -p 80:8080 parser`
+If following string is seen that means the application is running:
+> `Grails application running at http://localhost:8080 in environment: development`
  
  #HOW TO WORK WITH
  
@@ -76,4 +41,36 @@ so it needs about 6-8 of disk space for correct work and at least 8 GB of RAM
     
  If the file has proper mapping it's data will be parsed and saved in the table `municipality_transactions` of the 
  database
+ 
+ ##How to check parsed data in the database
+ When .csv file has been successfully parsed the parsed data cah be checked with following steps:
+ 1. Run following command to get running containers 
+ 
+    > ``docker ps -l``
+    
+    if everything is ok at least one container should be in the command's output. For example:
+    
+     > ``CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              
+     PORTS                                                     NAMES``
+      
+     > ``09df785d76a7        mytest              "/app/start_mysql...."   14 minutes ago      Up 13 minutes       0.0
+        .0.0:3306->3306/tcp, 33060/tcp, 0.0.0.0:80->8080/tcp   blissful_noyce``
+ 
+    we need `CONTAINER ID` in this case it looks like this `09df785d76a7`
+ 2. Now to make bash commands being in container run this command:
+    > ``docker exec -it hash_from_previous_step /bin/bash``
+ 
+    it should lead into the container and we should see smth like this:
+    > ``root@09df785d76a7:/app#``
+ 3. Run command to connect to container's mysql:
+    > ``mysql -u root -p1234``    
+    
+    Now console should show `mysql>`
+    
+ 4. Then being in mysql console run following commands:    
+    > `use parser;`
+    
+    > `select * from municipality_transactions;`
+    
+    then console should output all the entries parsed and saved in the database
  

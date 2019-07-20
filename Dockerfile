@@ -16,7 +16,7 @@ FROM mysql:5.7.26
 
 # set database name and root user password
 ENV MYSQL_HOST localhost
-ENV MYSQL_ROOT_PASSWORD 5233
+ENV MYSQL_ROOT_PASSWORD 1234
 ENV MYSQL_DATABASE parser
 
 ENV GOSU_VERSION 1.7
