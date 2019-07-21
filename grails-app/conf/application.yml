@@ -77,8 +77,10 @@ environments:
     production:
         useSSL: false
         dataSource:
+            dbCreate: update
             driverClassName: com.mysql.cj.jdbc.Driver
-            url: '${DB_URL}'
+            dbHost: '${DB_URL}'
+            url: 'jdbc:mysql://${DB_URL}/${DB_NAME}'
             username: '${DB_USERNAME}'
             password: '${DB_PASS}'
             dialect: org.hibernate.dialect.MySQL5Dialect
