@@ -48,7 +48,7 @@ class ApiController extends RestfulController {
         log.debug "Finish writing file"
         String dbUsername = grailsApplication.config.getProperty('dataSource.username')
         String dbPass = grailsApplication.config.getProperty('dataSource.password')
-        String dbHostName = grailsApplication.config.getProperty('dataSource.dbHostName')
+        String dbHostName = grailsApplication.config.getProperty('dataSource.url')
         log.debug("data from file: ${newFile.absolutePath}")
         String cmd = "mysql --version"
         def pr = ['bash', '-c', cmd].execute()
