@@ -55,13 +55,13 @@ class ApiController extends RestfulController {
         def pr = ['bash', '-c', cmd].execute()
         pr.waitFor()
         log.debug "mysql version: ${pr.text}"
-        String createTable = "mysql -u ${dbUsername} -p${dbPass} -h${dbHostName} -е \"use ${dbName}; CREATE TABLE " +
+        String createTable = "mysql -u ${dbUsername} -p${dbPass} -h ${dbHostName} -е \"use ${dbName}; CREATE TABLE " +
                 "`municipality_transactions` (\n" +
                 "  `id` bigint(20) NOT NULL AUTO_INCREMENT) ENGINE=InnoDB DEFAULT CHARSET=latin1;\" "
         def create = ['bash', '-c', createTable].execute()
         create.waitFor()
         log.debug "creating: ${create.text}"
-        String command = "mysql -u ${dbUsername} -p${dbPass} -h${dbHostName} " +
+        String command = "mysql -u ${dbUsername} -p${dbPass} -h ${dbHostName} " +
                 " -e \"use ${dbName}; LOAD DATA LOCAL INFILE '${newFile.absolutePath}' INTO " +
                 "TABLE " +
                 "municipality_transactions FIELDS TERMINATED BY ','\""
