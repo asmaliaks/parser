@@ -65,7 +65,7 @@ class ApiController extends RestfulController {
         String command = "mysql -u ${dbUsername} -p${dbPass} -h ${dbEndpoint} " +
                 " -e \"use ${dbName}; LOAD DATA LOCAL INFILE '${newFile.absolutePath}' INTO " +
                 "TABLE " +
-                "municipality_transactions FIELDS TERMINATED BY ','\""
+                "municipality_transactions FIELDS TERMINATED BY ',';\""
         log.debug "${command}"
         def process = ['bash', '-c', command + "\""].execute()
         process.waitFor()
