@@ -85,6 +85,17 @@ environments:
             username: '${DB_USERNAME}'
             password: '${DB_PASS}'
             dialect: org.hibernate.dialect.MySQL5Dialect
+    development:
+        useSSL: false
+        dataSource:
+            dbCreate: update
+            driverClassName: com.mysql.cj.jdbc.Driver
+            dbHost: '${DB_URL}'
+            url: 'jdbc:mysql://${DB_URL}/${DB_NAME}'
+            dbName: '${DB_NAME}'
+            username: '${DB_USERNAME}'
+            password: '${DB_PASS}'
+            dialect: org.hibernate.dialect.MySQL5Dialect
     test:
         dataSource:
             dbCreate: update
