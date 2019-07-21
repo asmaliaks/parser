@@ -15,7 +15,7 @@ plugins {
     id "fi.evident.beanstalk" version "0.2.0"
 }
 
-version "0.1-SNAPSHOT"
+version "0.2"
 group "parser"
 
 apply plugin:"eclipse"
