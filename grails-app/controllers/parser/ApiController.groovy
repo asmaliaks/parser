@@ -50,12 +50,23 @@ class ApiController extends RestfulController {
         String dbPass = grailsApplication.config.getProperty('dataSource.password')
         String dbHostName = grailsApplication.config.getProperty('dataSource.dbHostName')
         log.debug("data from file: ${newFile.absolutePath}")
+        String cmd = "mysql --version"
+        def pr = ['bash', '-c', cmd].execute()
+        pr.waitFor()
+        log.debug "mysql version: ${pr.text}"
+        String createTable = "mysql -u ${dbUsername} -p${dbPass} -h${dbHostName} \"use grails; CREATE TABLE `municipality_transactions` (\n" +
+                "  `id` bigint(20) NOT NULL AUTO_INCREMENT) ENGINE=InnoDB DEFAULT CHARSET=latin1;\" "
+        def create = ['bash', '-c', createTable].execute()
+        create.waitFor()
+        log.debug "creating: ${create.text}"
         String command = "mysql -u ${dbUsername} -p${dbPass} -h${dbHostName}" +
                 "-e \"use parser; LOAD DATA LOCAL INFILE '${newFile.absolutePath}' INTO " +
                 "TABLE " +
                 "municipality_transactions FIELDS TERMINATED BY ','"
+        log.debug "${command}"
         def process = ['bash', '-c', command + "\""].execute()
         process.waitFor()
+        log.debug "${process.text}"
         log.debug("FINISH READING")
         response.status = 200
         respond(["done"])
