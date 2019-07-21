@@ -22,7 +22,7 @@ class ApiController extends RestfulController {
         log.debug("START")
         MultipartFile file = request.getFile('file')
         InputStream inputStream = file.getInputStream()
-        File newFile = new File('file.csv')
+        File newFile = new File('/tmp/file.csv')
         newFile.text = ""
         log.debug("START READING")
         BigInteger lineNumber = 1
