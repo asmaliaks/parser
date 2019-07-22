@@ -79,7 +79,6 @@ environments:
         dataSource:
             dbCreate: update
             driverClassName: com.mysql.cj.jdbc.Driver
-            dbHost: 'grails.c8mu49pmuhir.us-east-2.rds.amazonaws.com'
             host: 'grails.c8mu49pmuhir.us-east-2.rds.amazonaws.com'
             url: 'jdbc:mysql://grails.c8mu49pmuhir.us-east-2.rds.amazonaws.com/grails'
             dbName: 'grails'
