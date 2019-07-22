@@ -58,7 +58,7 @@ class ApiController extends RestfulController {
         pr.waitFor()
         log.debug "mysql version: ${pr.text}"
         String createTable = "mysql -u ${dbUsername} -p${dbPass} -h ${dbEndpoint} -е \"use ${dbName}; CREATE TABLE " +
-                "`municipality_transactions` (\n" +
+                "`test_table` (\n" +
                 "  `id` bigint(20) NOT NULL AUTO_INCREMENT) ENGINE=InnoDB DEFAULT CHARSET=latin1;\" "
         log.debug "test table: ${createTable}"
         def create = ['bash', '-c', createTable].execute()
