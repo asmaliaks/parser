@@ -60,7 +60,7 @@ class ApiController extends RestfulController {
         String createTable = "mysql -u ${dbUsername} -p${dbPass} -h ${dbEndpoint} -e \"use ${dbName}; CREATE TABLE IF" +
                 " NOT EXISTS " +
                 "test_table (" +
-                "  id INT AUTO_INCREMENT) ENGINE=InnoDB DEFAULT CHARSET=latin1;\" "
+                "  id INT) ENGINE=InnoDB DEFAULT CHARSET=latin1;\" "
         log.debug "test table: ${createTable}"
         def create = ['bash', '-c', createTable].execute()
         create.waitFor()
