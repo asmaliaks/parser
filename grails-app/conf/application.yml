@@ -74,16 +74,17 @@ hibernate:
         use_query_cache: false
 
 environments:
-    development:
+    production:
         useSSL: false
         dataSource:
             dbCreate: update
             driverClassName: com.mysql.cj.jdbc.Driver
-            host: 'rds_endpoint'
-            url: 'jdbc:mysql://rds_endpoint/db_name'
-            dbName: 'db_name'
-            username: 'db_username'
-            password: 'db_pass'
+            dbHost: 'grails.c8mu49pmuhir.us-east-2.rds.amazonaws.com'
+            host: 'grails.c8mu49pmuhir.us-east-2.rds.amazonaws.com'
+            url: 'jdbc:mysql://grails.c8mu49pmuhir.us-east-2.rds.amazonaws.com/grails'
+            dbName: 'grails'
+            username: 'root'
+            password: 'ha-97ug4h-a74'
             dialect: org.hibernate.dialect.MySQL5Dialect
     test:
         dataSource:
