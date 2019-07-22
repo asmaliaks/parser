@@ -22,7 +22,7 @@ class ApiController extends RestfulController {
         log.debug("START")
         MultipartFile file = request.getFile('file')
         InputStream inputStream = file.getInputStream()
-        File newFile = new File('/tmp/file.csv')
+        File newFile = new File("/tmp/file-${new Date()}.csv")
         newFile.text = ""
         log.debug("START READING")
         BigInteger lineNumber = 1
@@ -51,7 +51,7 @@ class ApiController extends RestfulController {
         String dbEndpoint = grailsApplication.config.getProperty('dataSource.host')
         String dbName = grailsApplication.config.getProperty('dataSource.dbName')
         log.debug("data from file: ${newFile.absolutePath}")
-        String cmd = "mysql --version"
+        String cmd = "mysql --version;"
         def pr = ['bash', '-c', cmd].execute()
         pr.waitFor()
         log.debug "mysql version: ${pr.text}"
@@ -68,14 +68,13 @@ class ApiController extends RestfulController {
                 "TABLE " +
                 "municipality_transactions FIELDS TERMINATED BY ',';\""
         log.debug "${command}"
-        def process = ['bash', '-c', command + "\""].execute()
+        def process = ['bash', '-c', command].execute()
         process.waitFor()
         log.debug "${process.text}"
         log.debug("FINISH READING")
         response.status = 200
         respond(["done"])
     }
-
     static String convertLinIntoItemCommand(final String line, final BigInteger lineNumber){
         List<String> item = line.split(";")
         String voucher_no = item[0] ?: ""
