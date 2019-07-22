@@ -48,7 +48,6 @@ class ApiController extends RestfulController {
         log.debug "Finish writing file"
         String dbUsername = grailsApplication.config.getProperty('dataSource.username')
         String dbPass = grailsApplication.config.getProperty('dataSource.password')
-        String dbHostName = grailsApplication.config.getProperty('dataSource.dbHost')
         String dbEndpoint = grailsApplication.config.getProperty('dataSource.host')
         String dbName = grailsApplication.config.getProperty('dataSource.dbName')
         log.debug("data from file: ${newFile.absolutePath}")

@@ -74,29 +74,16 @@ hibernate:
         use_query_cache: false
 
 environments:
-    production:
-        useSSL: false
-        dataSource:
-            dbCreate: update
-            driverClassName: com.mysql.cj.jdbc.Driver
-            dbHost: '${DB_URL}'
-            host: '${DB_ENDPOINT}'
-            url: 'jdbc:mysql://${DB_URL}/${DB_NAME}'
-            dbName: '${DB_NAME}'
-            username: '${DB_USERNAME}'
-            password: '${DB_PASS}'
-            dialect: org.hibernate.dialect.MySQL5Dialect
     development:
         useSSL: false
         dataSource:
             dbCreate: update
             driverClassName: com.mysql.cj.jdbc.Driver
-            dbHost: '${DB_URL}'
-            host: '${DB_ENDPOINT}'
-            url: 'jdbc:mysql://${DB_URL}/${DB_NAME}'
-            dbName: '${DB_NAME}'
-            username: '${DB_USERNAME}'
-            password: '${DB_PASS}'
+            host: 'rds_endpoint'
+            url: 'jdbc:mysql://rds_endpoint/db_name'
+            dbName: 'db_name'
+            username: 'db_username'
+            password: 'db_pass'
             dialect: org.hibernate.dialect.MySQL5Dialect
     test:
         dataSource:
