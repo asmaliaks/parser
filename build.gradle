@@ -82,7 +82,7 @@ beanstalk {
         production {
             file = tasks.war
             application = 'parser'
-            environment = 'Parser-prod-1'
+            environment = 'Parser-prod-2'
         }
     }
 }
