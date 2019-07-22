@@ -79,11 +79,11 @@ environments:
         dataSource:
             dbCreate: update
             driverClassName: com.mysql.cj.jdbc.Driver
-            host: 'grails.c8mu49pmuhir.us-east-2.rds.amazonaws.com'
-            url: 'jdbc:mysql://grails.c8mu49pmuhir.us-east-2.rds.amazonaws.com/grails'
-            dbName: 'grails'
-            username: 'root'
-            password: 'ha-97ug4h-a74'
+            host: 'rds_database_endpoint'
+            url: 'jdbc:mysql://rds_database_endpoint/rds_database_name'
+            dbName: 'rds_database_name'
+            username: 'db_username'
+            password: 'db_password'
             dialect: org.hibernate.dialect.MySQL5Dialect
     test:
         dataSource:
