@@ -55,14 +55,6 @@ class ApiController extends RestfulController {
         def pr = ['bash', '-c', cmd].execute()
         pr.waitFor()
         log.debug "mysql version: ${pr.text}"
-        String createTable = "mysql -u ${dbUsername} -p${dbPass} -h ${dbEndpoint} -e \"use ${dbName}; CREATE TABLE IF" +
-                " NOT EXISTS " +
-                "test_table (" +
-                "  id INT) ENGINE=InnoDB DEFAULT CHARSET=latin1;\" "
-        log.debug "test table: ${createTable}"
-        def create = ['bash', '-c', createTable].execute()
-        create.waitFor()
-        log.debug "creating: ${create.text}"
         String command = "mysql -u ${dbUsername} -p${dbPass} -h ${dbEndpoint} " +
                 " -e \"use ${dbName}; LOAD DATA LOCAL INFILE '${newFile.absolutePath}' INTO " +
                 "TABLE " +
@@ -72,6 +64,8 @@ class ApiController extends RestfulController {
         process.waitFor()
         log.debug "${process.text}"
         log.debug("FINISH READING")
+        newFile.delete()
+        log.debug "File deleted: ${newFile.name}"
         response.status = 200
         respond(["done"])
     }
