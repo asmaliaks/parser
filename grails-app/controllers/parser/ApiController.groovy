@@ -22,10 +22,8 @@ class ApiController extends RestfulController {
         log.debug("START")
         MultipartFile file = request.getFile('file')
         InputStream inputStream = file.getInputStream()
-        File newFile = new File('/tmp/tomcat/uploads/file.csv')
+        File newFile = new File('/tmp/file.csv')
         newFile.text = ""
-        newFile.setReadable(true)
-        newFile.setExecutable(true)
         log.debug("START READING")
         BigInteger lineNumber = 1
 
