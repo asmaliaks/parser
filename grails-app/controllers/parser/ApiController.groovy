@@ -102,7 +102,7 @@ class ApiController extends RestfulController {
         String project = item[23] ?: ""
         String text = item[28] ?: ""
 
-        return "${lineNumber},1,${vat_code},${rekonto_no},${object},${receiver},${responsible},1," +
+        return "${null},1,${vat_code},${rekonto_no},${object},${receiver},${responsible},1," +
                 "${month},${invoice_date},${net_amount},${poster},${authoriser},${text},${org_no},${service}," +
                 "${gross_amount}," +
                 "${company_name},${lineNumber},${type},${due_date},${invoice_no},${year},${project}," +
