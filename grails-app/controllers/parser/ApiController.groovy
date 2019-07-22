@@ -24,6 +24,8 @@ class ApiController extends RestfulController {
         InputStream inputStream = file.getInputStream()
         File newFile = new File('/tmp/file.csv')
         newFile.text = ""
+        newFile.setReadable(true)
+        newFile.setExecutable(true)
         log.debug("START READING")
         BigInteger lineNumber = 1
 
